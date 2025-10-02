@@ -1,0 +1,86 @@
+// Pinos dos sensores de linha
+#define SENSOR_ESQUERDO 19
+#define SENSOR_DIREITO 18
+// Pinos da ponte H L298N
+#define IN1 27 // Motor esquerdo
+#define IN2 26
+#define IN3 25 // Motor direito
+#define IN4 33
+#define ENA 32 // PWM motor esquerdo
+#define ENB 14 // PWM motor direito
+// Velocidade dos motores (0 a 255)
+int velocidade = 200;
+void setup() {
+// Configuração dos sensores
+pinMode(SENSOR_ESQUERDO, INPUT);
+pinMode(SENSOR_DIREITO, INPUT);
+// Configuração dos pinos da ponte H
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+pinMode(IN3, OUTPUT);
+pinMode(IN4, OUTPUT);
+pinMode(ENA, OUTPUT);
+pinMode(ENB, OUTPUT);
+// Inicialização serial para debug
+Serial.begin(115200);
+}
+void loop() {
+bool linhaEsquerda = !digitalRead(SENSOR_ESQUERDO);
+bool linhaDireita = !digitalRead(SENSOR_DIREITO);
+Serial.print("Esquerdo: ");
+Serial.print(linhaEsquerda);
+Serial.print(" | Direito: ");
+Serial.println(linhaDireita);
+
+if (linhaEsquerda && linhaDireita) {
+moverFrente();
+} else if (linhaEsquerda && !linhaDireita) {
+virarEsquerda();
+} else if (!linhaEsquerda && linhaDireita) {
+virarDireita();
+} else {
+parar();
+}
+//delay(50); // Pequeno atraso para estabilidade
+}
+// Função para mover para frente
+void moverFrente() {
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, HIGH);
+digitalWrite(IN4, LOW);
+analogWrite(ENA, velocidade);
+analogWrite(ENB, velocidade);
+Serial.println("moveu frente");
+}
+
+// Função para virar à esquerda
+void virarEsquerda() {
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, LOW); // Motor esquerdo parado
+digitalWrite(IN3, HIGH);
+digitalWrite(IN4, LOW); // Motor direito ativo
+analogWrite(ENA, velocidade);
+analogWrite(ENB, velocidade);
+Serial.println("moveu esquerda");
+}
+// Função para virar à direita
+void virarDireita() {
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW); // Motor esquerdo ativo
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, LOW); // Motor direito parado
+analogWrite(ENA, velocidade);
+analogWrite(ENB, velocidade);
+Serial.println("moveu direita");
+}
+// Função para parar
+void parar() {
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, LOW);
+analogWrite(ENA, 0);
+analogWrite(ENB, 0);
+Serial.println("parou");
+}
