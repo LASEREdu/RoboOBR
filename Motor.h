@@ -1,5 +1,6 @@
 class MotorEsp {
   private:
+  
     int velPIN;
     int in1;
     int in2;
